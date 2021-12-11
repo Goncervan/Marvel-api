@@ -1,32 +1,33 @@
 import React, { useState } from 'react'
-import { Link } from 'react-router-dom';
 import { useEffect } from 'react';
 import { useDispatch, useSelector } from "react-redux";
-import getCharacters from '../actions'
-import { searchByName } from '../actions';
+import { Link } from 'react-router-dom';
+import { getSeries, getSeriesByName } from '../actions';
 import s from './Styles/Home.module.css'
 
-export default function Home() {
+export default function Series() {
     const dispatch = useDispatch();
-    const characters = useSelector(state => state.allCharacters)
+    const series = useSelector(state => state.allSeries)
 
     const [page, setPage] = useState(0)
-    const [searchName, setSearchName] = useState(false)
-    const [name, setName] = useState("")
+    const [searchSerie, setSearchSerie] = useState(false)
+    const [serie, setSerie] = useState("")
 
     useEffect(() => {
-        if (searchName) {
-            dispatch(searchByName(name, page))
+        if (searchSerie) {
+            dispatch(getSeriesByName(serie, page))
+            console.log("serie")
         } else {
-            dispatch(getCharacters(page))
+            dispatch(getSeries(page))
+            console.log("no serie")
         }
+        console.log(series)
     }, [page])
-
     // -------------------------------------------Paginación----------------------------------------------
     function handleNextPage(e) {
         e.preventDefault();
-        if (page <= characters.total) {
-            setPage(page + 20)
+        if (page <= series.total) {
+            setPage(page + 21)
             window.scrollTo({ top: 0, left: 0, behavior: "smooth" });
         } else {
             alert("Last page")
@@ -35,14 +36,12 @@ export default function Home() {
     function handlePrevPage(e) {
         e.preventDefault();
         if (page !== 0) {
-            setPage(page - 20)
+            setPage(page - 21)
             window.scrollTo({ top: 0, left: 0, behavior: "smooth" });
         } else if (page === 0) {
             alert("First page")
         }
     }
-
-
     // ---------------------------------------Botones funcionales---------------------------------------
     function handleDown(e) {
         e.preventDefault();
@@ -54,21 +53,20 @@ export default function Home() {
     }
     function handleReload(e) {
         e.preventDefault();
-        setSearchName(false)
-        dispatch(getCharacters(0));
+        setSearchSerie(false)
+        dispatch(getSeries(0));
     }
-
     // --------------------------------------------Busqueda--------------------------------------------
+    function handleInputSerie(e) {
+        e.preventDefault();
+        setSerie(e.target.value);
+    }
+    function handleSearchSerie(e) {
+        e.preventDefault();
+        setSearchSerie(true);
+        dispatch(getSeriesByName(serie, 0))
+    }
 
-    function handleInputName(e) {
-        e.preventDefault();
-        setName(e.target.value);
-    }
-    function handleSearchName(e) {
-        e.preventDefault();
-        setSearchName(true);
-        dispatch(searchByName(name, 0));
-    }
 
     return (
         <div className={s.prin}>
@@ -80,29 +78,41 @@ export default function Home() {
                     </Link>
                     <div className={s.containerSearch}>
                         <div className={s.inputcontainer}>
-                            <span> Search by Name</span>
+                            <span>Search by Name</span>
                             <input
-                                placeholder='Example: Iron-man'
+                                placeholder='Example: Avengers'
                                 type="text"
-                                onChange={(e) => handleInputName(e)}
+                                onChange={(e) => handleInputSerie(e)}
                             />
                         </div>
                         <button
                             className={s.btn}
-                            onClick={(e) => handleSearchName(e)}>Search
+                            onClick={(e) => handleSearchSerie(e)}>Search
                         </button>
                     </div>
-                    <button className={s.btn} onClick={(e) => handleReload(e)}>Reload Characters</button>
+                    <button className={s.btn} onClick={(e) => handleReload(e)}>Reload Series</button>
                 </nav>
-                <div className={s.containerCh}>
-                    {characters?.results?.map(el => {
+                <div className={s.containerSeries}>
+                    {series?.results?.map((el) => {
                         return (
-                            <Link className={s.link} to={"/details/" + el.id}>
-                                <div className={s.card} key={el.id}>
-                                    <img className={s.img} alt="" src={`${el.thumbnail.path}.${el.thumbnail.extension}`} />
-                                    <span className={s.cardName}>{el.name}</span>
+                            <div className={s.cardSeries} key={el.id}>
+                                <h1>{el.title}</h1>
+                                <div className={s.contCard}>
+                                    <div>
+                                        <img className={s.img} alt="" src={`${el.thumbnail.path}.${el.thumbnail.extension}`} />
+                                    </div>
+                                    <div>
+                                        <h3>Start : {el.startYear}</h3>
+                                        <h3>End : {el.endYear}</h3>
+                                        {el.type.length > 0 ? (<h3>Type : {el.type}</h3>) : (<></>)}
+                                        {/* {el.characters?.items?.map((e) => {
+                                        return (
+                                            <h5>{e.name}</h5>
+                                        )
+                                    })} */}
+                                    </div>
                                 </div>
-                            </Link>
+                            </div>
                         )
                     })}
                 </div>

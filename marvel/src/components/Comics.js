@@ -1,32 +1,30 @@
 import React, { useState } from 'react'
-import { Link } from 'react-router-dom';
 import { useEffect } from 'react';
+import { Link } from 'react-router-dom';
 import { useDispatch, useSelector } from "react-redux";
-import getCharacters from '../actions'
-import { searchByName } from '../actions';
+import { getComics, getComicsByName } from '../actions';
 import s from './Styles/Home.module.css'
 
-export default function Home() {
+export default function Comics() {
     const dispatch = useDispatch();
-    const characters = useSelector(state => state.allCharacters)
+    const comics = useSelector(state => state.allComics)
 
     const [page, setPage] = useState(0)
-    const [searchName, setSearchName] = useState(false)
-    const [name, setName] = useState("")
+    const [searchComics, setSearchComics] = useState(false)
+    const [comic, setComic] = useState("")
 
     useEffect(() => {
-        if (searchName) {
-            dispatch(searchByName(name, page))
+        if (searchComics) {
+            dispatch(getComicsByName(comic, page))
         } else {
-            dispatch(getCharacters(page))
+            dispatch(getComics(page))
         }
     }, [page])
-
     // -------------------------------------------Paginación----------------------------------------------
     function handleNextPage(e) {
         e.preventDefault();
-        if (page <= characters.total) {
-            setPage(page + 20)
+        if (page <= comics.total) {
+            setPage(page + 21)
             window.scrollTo({ top: 0, left: 0, behavior: "smooth" });
         } else {
             alert("Last page")
@@ -35,14 +33,12 @@ export default function Home() {
     function handlePrevPage(e) {
         e.preventDefault();
         if (page !== 0) {
-            setPage(page - 20)
+            setPage(page - 21)
             window.scrollTo({ top: 0, left: 0, behavior: "smooth" });
         } else if (page === 0) {
             alert("First page")
         }
     }
-
-
     // ---------------------------------------Botones funcionales---------------------------------------
     function handleDown(e) {
         e.preventDefault();
@@ -54,21 +50,20 @@ export default function Home() {
     }
     function handleReload(e) {
         e.preventDefault();
-        setSearchName(false)
-        dispatch(getCharacters(0));
+        setSearchComics(false)
+        dispatch(getComics(0));
     }
-
     // --------------------------------------------Busqueda--------------------------------------------
+    function handleInputComic(e) {
+        e.preventDefault();
+        setComic(e.target.value);
+    }
+    function handleSearchComic(e) {
+        e.preventDefault();
+        setSearchComics(true);
+        dispatch(getComicsByName(comic, 0))
+    }
 
-    function handleInputName(e) {
-        e.preventDefault();
-        setName(e.target.value);
-    }
-    function handleSearchName(e) {
-        e.preventDefault();
-        setSearchName(true);
-        dispatch(searchByName(name, 0));
-    }
 
     return (
         <div className={s.prin}>
@@ -80,29 +75,39 @@ export default function Home() {
                     </Link>
                     <div className={s.containerSearch}>
                         <div className={s.inputcontainer}>
-                            <span> Search by Name</span>
+                            <span>Name</span>
                             <input
                                 placeholder='Example: Iron-man'
                                 type="text"
-                                onChange={(e) => handleInputName(e)}
+                                onChange={(e) => handleInputComic(e)}
                             />
                         </div>
                         <button
                             className={s.btn}
-                            onClick={(e) => handleSearchName(e)}>Search
+                            onClick={(e) => handleSearchComic(e)}>Search
                         </button>
                     </div>
-                    <button className={s.btn} onClick={(e) => handleReload(e)}>Reload Characters</button>
+                    <button className={s.btn} onClick={(e) => handleReload(e)}>Reload Comics</button>
                 </nav>
-                <div className={s.containerCh}>
-                    {characters?.results?.map(el => {
+                <div className={s.containerSeries}>
+                    {comics?.results?.map((el) => {
                         return (
-                            <Link className={s.link} to={"/details/" + el.id}>
-                                <div className={s.card} key={el.id}>
+                            <div className={s.cardSeries} key={el.id}>
+                                <h1>{el.title}</h1>
+                                <div className={s.contCard}>
                                     <img className={s.img} alt="" src={`${el.thumbnail.path}.${el.thumbnail.extension}`} />
-                                    <span className={s.cardName}>{el.name}</span>
                                 </div>
-                            </Link>
+                                <div>
+                                    {/* {el.pageCount > 0 ? (<h3>Total pages : {el.pageCount}</h3>) : (<></>)}
+                                    <h3>End : {el.endYear}</h3>
+                                    { el.type.length > 0 ? (<h3>Type : {el.type}</h3>) : (<></>)}
+                                    {el.characters?.items?.map((e) => {
+                                        return (
+                                            <h5 key={el.name}>{e.name}</h5>
+                                        )
+                                    })} */}
+                                </div>
+                            </div>
                         )
                     })}
                 </div>

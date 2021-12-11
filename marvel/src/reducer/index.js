@@ -1,5 +1,8 @@
 const initialState = {
-    allCharacters: []
+    allCharacters: [],
+    allSeries: [],
+    allComics: [],
+    detail: []
 }
 
 function rootReducer(state = initialState, action) {
@@ -15,20 +18,30 @@ function rootReducer(state = initialState, action) {
                 ...state,
                 allCharacters: action.payload
             }
-        case 'SEARCH_BY_STORY':
+        case 'GET_CHARACTER_DETAIL':
             return {
                 ...state,
-                allCharacters: action.payload
+                detail: action.payload
             }
-        case 'SEARCH_BY_COMIC':
+        case 'GET_COMICS':
             return {
                 ...state,
-                allCharacters: action.payload
+                allComics: action.payload
             }
-        case 'SEARCH_BY_SERIE':
+        case 'GET_COMICS_BY_NAME':
             return {
                 ...state,
-                allCharacters: action.payload
+                allComics: action.payload
+                }
+        case 'GET_SERIES':
+            return {
+                ...state,
+                allSeries: action.payload
+            }
+        case 'GET_SERIES_BY_NAME':
+            return {
+                ...state,
+                allSeries: action.payload
             }
     }
 }
